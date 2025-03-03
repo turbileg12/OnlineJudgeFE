@@ -45,15 +45,15 @@ module.exports = {
     minimize: true,
     minimizer: [
       new TerserPlugin({
+        minify: TerserPlugin.uglifyJsMinify,
         exclude: /\.min\.js$/,
-        parallel: true,
         terserOptions: {
-          compress: {
-            drop_console: NODE_ENV === 'production'
-          }
-        }
-      })
-    ]
+          sourceMap: true,
+        },
+        extractComments: false,
+      }),
+    ],
+    //nodeEnv: false
   },
   plugins: [
     new webpack.DefinePlugin({
