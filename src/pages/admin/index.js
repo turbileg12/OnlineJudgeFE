@@ -1,4 +1,4 @@
-import 'babel-polyfill'
+import "core-js/stable"
 import Vue from 'vue'
 import App from './App.vue'
 import store from '@/store'

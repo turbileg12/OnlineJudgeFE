@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require("terser-webpack-plugin")
 const config = require('../config')
 const utils = require('./utils')
 const glob = require('glob')
@@ -40,21 +40,31 @@ module.exports = {
     filename: '[name].dll.[hash:7].js',
     library: '[name]_[hash]_dll',
   },
+  optimization: {
+    concatenateModules: true,
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        minify: TerserPlugin.uglifyJsMinify,
+        exclude: /\.min\.js$/,
+        terserOptions: {
+          sourceMap: true,
+        },
+        extractComments: false,
+      }),
+    ],
+    //nodeEnv: false
+  },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': NODE_ENV === 'production' ? config.build.env : config.dev.env
     }),
-    new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /zh-cn/),
-    new UglifyJSPlugin({
-      exclude: /\.min\.js$/,
-      cache: true,
-      parallel: true
-    }),
     new webpack.DllPlugin({
       context: __dirname,
       path: path.join(__dirname, '[name]-manifest.json'),
       name: '[name]_[hash]_dll',
-    })
-  ]
+    }),
+  ],
+  mode: process.env.NODE_ENV !== 'production' ? 'development' : 'production',
 };

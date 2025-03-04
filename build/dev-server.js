@@ -10,7 +10,8 @@ const opn = require('opn')
 const path = require('path')
 const express = require('express')
 const webpack = require('webpack')
-const proxyMiddleware = require('http-proxy-middleware')
+
+const { createProxyMiddleware } = require('http-proxy-middleware')
 const webpackConfig = require('./webpack.dev.conf')
 
 // default port where dev server listens for incoming traffic
@@ -26,13 +27,21 @@ const compiler = webpack(webpackConfig)
 
 const devMiddleware = require('webpack-dev-middleware')(compiler, {
   publicPath: webpackConfig.output.publicPath,
-  quiet: true
 })
+
 
 const hotMiddleware = require('webpack-hot-middleware')(compiler, {
   log: false,
   heartbeat: 2000
 })
+
+// new hook for webpack 5
+compiler.hooks.done.tap('done', stats => {
+  if (stats.hasErrors()) {
+    console.error(stats.toString('errors-only'))
+  }
+})
+
 // force page reload when html-webpack-plugin template changes
 // currently disabled until this is resolved:
 // https://github.com/jantimon/html-webpack-plugin/issues/680
@@ -53,14 +62,14 @@ Object.keys(proxyTable).forEach(function (context) {
   if (typeof options === 'string') {
     options = { target: options }
   }
-  app.use(proxyMiddleware(options.filter || context, options))
+  app.use(context, createProxyMiddleware(options))
 })
 
-// handle fallback for HTML5 history API
+// HTML5 history API
 const rewrites = {
   rewrites: [{
-    from: '/admin/', // 正则或者字符串
-    to: '/admin/index.html', // 字符串或者函数
+    from: '/admin/',
+    to: '/admin/index.html',
   }]
 }
 const historyMiddleware = require('connect-history-api-fallback')(rewrites);
@@ -75,15 +84,15 @@ app.use(staticPath, express.static('./static'))
 
 const uri = 'http://localhost:' + port
 
-var _resolve
-var _reject
-var readyPromise = new Promise((resolve, reject) => {
+let _resolve
+let _reject
+const readyPromise = new Promise((resolve, reject) => {
   _resolve = resolve
   _reject = reject
 })
 
-var server
-var portfinder = require('portfinder')
+let server
+const portfinder = require('portfinder')
 portfinder.basePort = port
 
 console.log('> Starting dev server...')
@@ -93,9 +102,8 @@ devMiddleware.waitUntilValid(() => {
       _reject(err)
     }
     process.env.PORT = port
-    var uri = 'http://localhost:' + port
+    const uri = 'http://localhost:' + port
     console.log('> Listening at ' + uri + '\n')
-    // when env is testing, don't need open it
     if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {
       opn(uri)
     }
