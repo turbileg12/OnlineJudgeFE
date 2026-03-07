@@ -312,9 +312,23 @@
       openUserDialog (id) {
         this.showUserDialog = true
         api.getUser(id).then(res => {
-          this.user = res.data.data
-          this.user.password = ''
-          this.user.real_tfa = this.user.two_factor_auth
+          let data = res.data.data
+          this.user = Object.assign({}, {
+            id: '',
+            username: '',
+            real_name: '',
+            email: '',
+            password: '',
+            admin_type: 'Regular User',
+            problem_permission: 'None',
+            two_factor_auth: false,
+            open_api: false,
+            is_disabled: false,
+            real_tfa: false
+          }, data, {
+            password: '',
+            real_tfa: data.two_factor_auth
+          })
         })
       },
       // 获取用户列表
