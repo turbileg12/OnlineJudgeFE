@@ -1,7 +1,7 @@
 <template>
   <Row type="flex" justify="space-around">
     <Col :span="22">
-    <h1 style="color: green; text-align: center; font-size: 48px;">SUCCESS</h1>
+    <h1 style="color: green; text-align: center; font-size: 48px;">SUCCESS!!!</h1>
     <panel shadow v-if="contests.length" class="contest">
       <div slot="title">
         <Button type="text"  class="contest-title" @click="goContest">{{contests[index].title}}</Button>
