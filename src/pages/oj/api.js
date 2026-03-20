@@ -259,6 +259,27 @@ export default {
       params
     })
   },
+  getComments (problemId, offset, limit) {
+    return ajax('comment', 'get', {
+      params: {
+        problem_id: problemId,
+        offset,
+        limit
+      }
+    })
+  },
+  createComment (data) {
+    return ajax('comment', 'post', {
+      data
+    })
+  },
+  deleteComment (id) {
+    return ajax('comment', 'delete', {
+      params: {
+        id
+      }
+    })
+  },
   getACMACInfo (params) {
     return ajax('admin/contest/acm_helper', 'get', {
       params

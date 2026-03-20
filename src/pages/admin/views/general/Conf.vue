@@ -80,6 +80,15 @@
                 </el-switch>
               </el-form-item>
             </el-col>
+            <el-col :span="12">
+              <el-form-item label="Enable Comments" label-width="200px">
+                <el-switch
+                  v-model="websiteConfig.comment_enabled"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+                </el-switch>
+              </el-form-item>
+            </el-col>
           </el-col>
         </el-row>
       </el-form>

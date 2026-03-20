@@ -99,6 +99,43 @@
           </Col>
         </Row>
       </Card>
+
+      <!--comment section-->
+      <div v-if="commentEnabled" id="comment-section">
+        <Card dis-hover>
+          <div slot="title">
+            <Icon type="chatbubbles"></Icon>
+            <span style="margin-left: 8px;">Comments</span>
+          </div>
+          <div v-if="isAuthenticated" class="comment-form">
+            <Input v-model="newComment" type="textarea" :rows="3" placeholder="Write a comment..."></Input>
+            <Button type="primary" style="margin-top: 10px;" @click="submitComment" :loading="submittingComment">
+              Submit Comment
+            </Button>
+          </div>
+          <div v-else class="comment-login-hint">
+            <Alert type="info" show-icon>Please login to leave a comment.</Alert>
+          </div>
+          <div class="comment-list" style="margin-top: 15px;">
+            <div v-if="comments.length === 0" style="text-align: center; color: #999; padding: 20px;">
+              No comments yet.
+            </div>
+            <div v-for="comment in comments" :key="comment.id" class="comment-item">
+              <div class="comment-header">
+                <span class="comment-user">{{ comment.created_by }}</span>
+                <span class="comment-time">{{ comment.create_time | localtime }}</span>
+                <Button v-if="isSuperAdmin" type="text" size="small" class="comment-delete" @click="deleteComment(comment.id)">
+                  <Icon type="trash-a" color="#ff4949"></Icon>
+                </Button>
+              </div>
+              <div class="comment-content">{{ comment.content }}</div>
+            </div>
+            <div v-if="commentTotal > comments.length" style="text-align: center; margin-top: 10px;">
+              <Button type="ghost" size="small" @click="loadMoreComments">Load More</Button>
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
 
     <div id="right-column">
@@ -250,6 +287,11 @@
           tags: [],
           io_mode: {'io_mode': 'Standard IO'}
         },
+        comments: [],
+        commentTotal: 0,
+        commentEnabled: false,
+        newComment: '',
+        submittingComment: false,
         pie: pie,
         largePie: largePie,
         // echarts 无法获取隐藏dom的大小，需手动指定
@@ -294,6 +336,7 @@
           if (problem.statistic_info) {
             this.changePie(problem)
           }
+          this.loadComments()
 
           // 在beforeRouteEnter中修改了, 说明本地有code，无需加载template
           if (this.code !== '') {
@@ -462,6 +505,48 @@
           submitFunc(data, true)
         }
       },
+      loadComments () {
+        api.getComments(this.problem.id, 0, 20).then(res => {
+          this.comments = res.data.data.results
+          this.commentTotal = res.data.data.total
+          this.commentEnabled = res.data.data.comment_enabled
+        })
+      },
+      loadMoreComments () {
+        api.getComments(this.problem.id, this.comments.length, 20).then(res => {
+          this.comments = this.comments.concat(res.data.data.results)
+          this.commentTotal = res.data.data.total
+        })
+      },
+      deleteComment (commentId) {
+        this.$Modal.confirm({
+          content: 'Are you sure you want to delete this comment?',
+          onOk: () => {
+            api.deleteComment(commentId).then(() => {
+              this.loadComments()
+              this.$success('Comment deleted')
+            })
+          }
+        })
+      },
+      submitComment () {
+        if (this.newComment.trim() === '') {
+          this.$error('Comment cannot be empty')
+          return
+        }
+        this.submittingComment = true
+        api.createComment({
+          problem_id: this.problem.id,
+          content: this.newComment
+        }).then(() => {
+          this.newComment = ''
+          this.submittingComment = false
+          this.loadComments()
+          this.$success('Comment submitted')
+        }, () => {
+          this.submittingComment = false
+        })
+      },
       onCopy (event) {
         this.$success('Code copied')
       },
@@ -471,6 +556,12 @@
     },
     computed: {
       ...mapGetters(['problemSubmitDisabled', 'contestRuleType', 'OIContestRealTimePermission', 'contestStatus']),
+      isAuthenticated () {
+        return this.$store.getters.isAuthenticated
+      },
+      isSuperAdmin () {
+        return this.$store.getters.isSuperAdmin
+      },
       contest () {
         return this.$store.state.contest.contest
       },
@@ -622,6 +713,42 @@
     margin-top: 20px;
     width: 500px;
     height: 480px;
+  }
+
+  #comment-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    .comment-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #e9eaec;
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+    .comment-header {
+      margin-bottom: 6px;
+      .comment-user {
+        font-weight: 600;
+        color: #3091f2;
+        margin-right: 10px;
+      }
+      .comment-time {
+        color: #999;
+        font-size: 12px;
+      }
+      .comment-delete {
+        margin-left: 8px;
+      }
+    }
+    .comment-content {
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .comment-login-hint {
+      margin-bottom: 10px;
+    }
   }
 </style>
 
