@@ -239,7 +239,7 @@ export const m = {
   ID: 'ID',
   Time: 'Time',
   Memory: 'Memory',
-  Author: 'Author',
+  Author: 'User',
   Option: 'Option',
   Mine: 'Mine',
   Search_Author: 'Search Author',

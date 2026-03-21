@@ -246,7 +246,17 @@
               render: (h, params) => {
                 let tags = []
                 params.row.tags.forEach(tag => {
-                  tags.push(h('Tag', {}, tag))
+                  tags.push(h('Tag', {
+                    props: {
+                      color: 'default',
+
+                    },
+                    style: {
+                      backgroundColor: 'white',
+                      borderColor: 'gray',
+                      fontWeight: 'bold'
+                    }
+                  }, tag))
                 })
                 return h('div', {
                   style: {
