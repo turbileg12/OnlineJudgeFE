@@ -208,6 +208,33 @@
             </el-form-item>
           </el-col>
 
+          <el-col :span="24" style="margin-top: 10px;">
+            <el-form-item label="Manual Test Cases">
+              <div v-for="(tc, index) in manualTestCases" :key="'tc'+index" style="margin-bottom: 15px; border: 1px solid #dcdfe6; padding: 15px; border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <strong>Test Case {{ index + 1 }}</strong>
+                  <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeManualTestCase(index)">Delete</el-button>
+                </div>
+                <el-row :gutter="20">
+                  <el-col :span="12">
+                    <el-form-item label="Input">
+                      <el-input type="textarea" :rows="4" placeholder="Input" v-model="tc.input"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="Output">
+                      <el-input type="textarea" :rows="4" placeholder="Output" v-model="tc.output"></el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </div>
+              <div>
+                <el-button type="primary" size="small" icon="el-icon-plus" @click="addManualTestCase">Add Test Case</el-button>
+                <el-button type="success" size="small" icon="el-icon-upload2" @click="submitManualTestCases" :loading="uploadingManual" :disabled="manualTestCases.length === 0">Upload Test Cases</el-button>
+              </div>
+            </el-form-item>
+          </el-col>
+
           <el-col :span="6">
             <el-form-item :label="$t('m.IOMode')">
               <el-radio-group v-model="problem.io_mode.io_mode">
@@ -298,6 +325,8 @@
           io_mode: {'io_mode': 'Standard IO', 'input': 'input.txt', 'output': 'output.txt'}
         },
         testCaseUploaded: false,
+        manualTestCases: [],
+        uploadingManual: false,
         allLanguage: {},
         inputVisible: false,
         tagInput: '',
@@ -481,6 +510,44 @@
       },
       uploadFailed () {
         this.$error('Upload failed')
+      },
+      addManualTestCase () {
+        this.manualTestCases.push({input: '', output: ''})
+      },
+      removeManualTestCase (index) {
+        this.manualTestCases.splice(index, 1)
+      },
+      submitManualTestCases () {
+        for (let tc of this.manualTestCases) {
+          if (!tc.input.trim() || (!this.problem.spj && !tc.output.trim())) {
+            this.$error('Test case input and output cannot be empty')
+            return
+          }
+        }
+        this.uploadingManual = true
+        let payload = {
+          test_cases: this.manualTestCases,
+          spj: this.problem.spj
+        }
+        if (this.problem.test_case_id) {
+          payload.test_case_id = this.problem.test_case_id
+        }
+        api.uploadManualTestCase(payload).then(res => {
+          this.uploadingManual = false
+          let fileList = res.data.data.info
+          for (let file of fileList) {
+            file.score = (100 / fileList.length).toFixed(0)
+            if (!file.output_name && this.problem.spj) {
+              file.output_name = '-'
+            }
+          }
+          this.problem.test_case_score = fileList
+          this.testCaseUploaded = true
+          this.problem.test_case_id = res.data.data.id
+          this.manualTestCases = []
+        }, () => {
+          this.uploadingManual = false
+        })
       },
       compileSPJ () {
         let data = {

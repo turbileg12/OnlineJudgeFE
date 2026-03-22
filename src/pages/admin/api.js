@@ -208,6 +208,11 @@ export default {
       params
     })
   },
+  uploadManualTestCase (data) {
+    return ajax('admin/manual_test_case', 'post', {
+      data
+    })
+  },
   compileSPJ (data) {
     return ajax('admin/compile_spj', 'post', {
       data
