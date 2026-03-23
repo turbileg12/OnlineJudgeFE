@@ -281,14 +281,19 @@
               </el-table-column>
               <el-table-column
                 label="Actions"
-                width="200">
+                width="300">
                 <template slot-scope="scope">
-                  <router-link :to="{name: 'test-case-content', params: {testCaseId: problem.test_case_id, filename: scope.row.input_name}}" target="_blank">
-                    <el-button type="text" size="small" icon="el-icon-document">{{ scope.row.input_name }}</el-button>
-                  </router-link>
-                  <router-link v-if="scope.row.output_name && scope.row.output_name !== '-'" :to="{name: 'test-case-content', params: {testCaseId: problem.test_case_id, filename: scope.row.output_name}}" target="_blank">
-                    <el-button type="text" size="small" icon="el-icon-document">{{ scope.row.output_name }}</el-button>
-                  </router-link>
+                  <div class="tc-actions">
+                    <router-link class="tc-btn tc-btn-in" :to="{name: 'test-case-content', params: {testCaseId: problem.test_case_id, filename: scope.row.input_name}}" target="_blank">
+                      <i class="el-icon-document"></i> {{ scope.row.input_name }}
+                    </router-link>
+                    <router-link v-if="scope.row.output_name && scope.row.output_name !== '-'" class="tc-btn tc-btn-out" :to="{name: 'test-case-content', params: {testCaseId: problem.test_case_id, filename: scope.row.output_name}}" target="_blank">
+                      <i class="el-icon-document"></i> {{ scope.row.output_name }}
+                    </router-link>
+                    <span class="tc-btn tc-btn-delete" @click="deleteTestCase(scope.row)">
+                      <i class="el-icon-delete"></i> Delete
+                    </span>
+                  </div>
                 </template>
               </el-table-column>
             </el-table>
@@ -561,6 +566,31 @@
           this.uploadingManual = false
         })
       },
+      deleteTestCase (row) {
+        this.$confirm('Are you sure you want to delete this test case?', 'Warning', {
+          confirmButtonText: 'Delete',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }).then(() => {
+          api.deleteTestCase({
+            test_case_id: this.problem.test_case_id,
+            input_name: row.input_name
+          }).then(res => {
+            let fileList = res.data.data.info
+            for (let file of fileList) {
+              file.score = (100 / fileList.length).toFixed(0)
+              if (!file.output_name && this.problem.spj) {
+                file.output_name = '-'
+              }
+            }
+            this.problem.test_case_score = fileList
+            if (fileList.length === 0) {
+              this.testCaseUploaded = false
+              this.problem.test_case_id = ''
+            }
+          })
+        }).catch(() => {})
+      },
       compileSPJ () {
         let data = {
           id: this.problem.id,
@@ -713,6 +743,50 @@
     }
     .add-sample-btn {
       margin-bottom: 10px;
+    }
+    .tc-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tc-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .tc-btn-in {
+      background-color: #ecf5ff;
+      color: #409eff;
+      border: 1px solid #d9ecff;
+      &:hover {
+        background-color: #409eff;
+        color: #fff;
+      }
+    }
+    .tc-btn-out {
+      background-color: #f0f9eb;
+      color: #67c23a;
+      border: 1px solid #e1f3d8;
+      &:hover {
+        background-color: #67c23a;
+        color: #fff;
+      }
+    }
+    .tc-btn-delete {
+      background-color: #fef0f0;
+      color: #f56c6c;
+      border: 1px solid #fde2e2;
+      &:hover {
+        background-color: #f56c6c;
+        color: #fff;
+      }
     }
 
   }

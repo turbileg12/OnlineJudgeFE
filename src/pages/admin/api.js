@@ -216,6 +216,11 @@ export default {
       }
     })
   },
+  deleteTestCase (data) {
+    return ajax('admin/delete_test_case', 'post', {
+      data
+    })
+  },
   uploadManualTestCase (data) {
     return ajax('admin/manual_test_case', 'post', {
       data
