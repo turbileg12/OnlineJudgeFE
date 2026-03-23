@@ -208,6 +208,14 @@ export default {
       params
     })
   },
+  getTestCaseContent (testCaseId, filename) {
+    return ajax('admin/test_case_content', 'get', {
+      params: {
+        test_case_id: testCaseId,
+        filename: filename
+      }
+    })
+  },
   uploadManualTestCase (data) {
     return ajax('admin/manual_test_case', 'post', {
       data

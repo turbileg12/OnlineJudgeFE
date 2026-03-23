@@ -279,6 +279,18 @@
                   </el-input>
                 </template>
               </el-table-column>
+              <el-table-column
+                label="Actions"
+                width="200">
+                <template slot-scope="scope">
+                  <router-link :to="{name: 'test-case-content', params: {testCaseId: problem.test_case_id, filename: scope.row.input_name}}" target="_blank">
+                    <el-button type="text" size="small" icon="el-icon-document">{{ scope.row.input_name }}</el-button>
+                  </router-link>
+                  <router-link v-if="scope.row.output_name && scope.row.output_name !== '-'" :to="{name: 'test-case-content', params: {testCaseId: problem.test_case_id, filename: scope.row.output_name}}" target="_blank">
+                    <el-button type="text" size="small" icon="el-icon-document">{{ scope.row.output_name }}</el-button>
+                  </router-link>
+                </template>
+              </el-table-column>
             </el-table>
           </el-col>
         </el-row>
