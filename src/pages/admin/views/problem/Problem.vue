@@ -18,23 +18,59 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="24">
-            <el-form-item prop="description" :label="$t('m.Description')" required>
-              <Simditor v-model="problem.description"></Simditor>
+            <el-form-item label="Description Mode">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <el-radio-group v-model="descriptionMode">
+                  <el-radio label="editor">Editor</el-radio>
+                  <el-radio label="pdf">PDF Upload</el-radio>
+                </el-radio-group>
+                <el-upload
+                  v-if="descriptionMode === 'pdf'"
+                  action="/api/admin/upload_file"
+                  name="file"
+                  accept=".pdf"
+                  :show-file-list="false"
+                  :on-success="pdfUploadSuccess"
+                  :on-error="pdfUploadError"
+                  :before-upload="beforePdfUpload"
+                  style="display: inline-block;">
+                  <el-button size="small" type="primary" icon="el-icon-upload">File Upload</el-button>
+                </el-upload>
+              </div>
+              <div v-if="descriptionMode === 'pdf' && problem.description_pdf" class="pdf-preview">
+                <div class="pdf-info">
+                  <i class="el-icon-document"></i>
+                  <span>PDF uploaded</span>
+                  <el-button type="text" size="small" @click="viewPdf">View</el-button>
+                  <el-button type="text" size="small" style="color: #f56c6c;" @click="removePdf">Remove</el-button>
+                </div>
+                <iframe :src="problem.description_pdf" class="pdf-frame"></iframe>
+              </div>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="20">
-          <el-col :span="24">
-            <el-form-item prop="input_description" :label="$t('m.Input_Description')" required>
-              <Simditor v-model="problem.input_description"></Simditor>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item prop="output_description" :label="$t('m.Output_Description')" required>
-              <Simditor v-model="problem.output_description"></Simditor>
-            </el-form-item>
-          </el-col>
-        </el-row>
+
+        <div v-if="descriptionMode === 'editor'">
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item prop="description" :label="$t('m.Description')" required>
+                <Simditor v-model="problem.description"></Simditor>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item prop="input_description" :label="$t('m.Input_Description')" required>
+                <Simditor v-model="problem.input_description"></Simditor>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item prop="output_description" :label="$t('m.Output_Description')" required>
+                <Simditor v-model="problem.output_description"></Simditor>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item :label="$t('m.Time_Limit') + ' (ms)' " required>
@@ -341,6 +377,7 @@
           languages: [],
           io_mode: {'io_mode': 'Standard IO', 'input': 'input.txt', 'output': 'output.txt'}
         },
+        descriptionMode: 'editor',
         testCaseUploaded: false,
         manualTestCases: [],
         uploadingManual: false,
@@ -392,7 +429,8 @@
           rule_type: 'ACM',
           hint: '',
           source: '',
-          io_mode: {'io_mode': 'Standard IO', 'input': 'input.txt', 'output': 'output.txt'}
+          io_mode: {'io_mode': 'Standard IO', 'input': 'input.txt', 'output': 'output.txt'},
+          description_pdf: ''
         }
         let contestID = this.$route.params.contestId
         if (contestID) {
@@ -421,6 +459,9 @@
             data.spj_language = data.spj_language || 'C'
             this.problem = data
             this.testCaseUploaded = true
+            if (data.description_pdf) {
+              this.descriptionMode = 'pdf'
+            }
           })
         } else {
           this.title = this.$i18n.t('m.Add_Problem')
@@ -462,6 +503,32 @@
       }
     },
     methods: {
+      beforePdfUpload (file) {
+        const isPdf = file.type === 'application/pdf'
+        if (!isPdf) {
+          this.$error('Only PDF files are allowed')
+        }
+        return isPdf
+      },
+      pdfUploadSuccess (response) {
+        console.log('PDF upload response:', response)
+        if (response.success) {
+          this.problem.description_pdf = response.file_path
+          this.$success('PDF uploaded successfully')
+        } else {
+          this.$error(response.msg || 'Upload failed')
+        }
+      },
+      pdfUploadError (err) {
+        console.error('PDF upload error:', err)
+        this.$error('PDF upload failed')
+      },
+      viewPdf () {
+        window.open(this.problem.description_pdf, '_blank')
+      },
+      removePdf () {
+        this.problem.description_pdf = ''
+      },
       switchSpj () {
         if (this.testCaseUploaded) {
           this.$confirm('If you change problem judge method, you need to re-upload test cases', 'Warning', {
@@ -617,14 +684,19 @@
         })
       },
       submit () {
-        if (!this.problem.samples.length) {
-          this.$error('Sample is required')
-          return
-        }
-        for (let sample of this.problem.samples) {
-          if (!sample.input || !sample.output) {
-            this.$error('Sample input and output is required')
+        if (this.descriptionMode === 'pdf') {
+          if (!this.problem.description_pdf) {
+            this.$error('Please upload a PDF file')
             return
+          }
+          if (!this.problem.description) {
+            this.problem.description = 'See PDF'
+          }
+          if (!this.problem.input_description) {
+            this.problem.input_description = 'See PDF'
+          }
+          if (!this.problem.output_description) {
+            this.problem.output_description = 'See PDF'
           }
         }
         if (!this.problem.tags.length) {
@@ -778,6 +850,30 @@
         background-color: #67c23a;
         color: #fff;
       }
+    }
+    .pdf-preview {
+      margin-top: 12px;
+    }
+    .pdf-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      background-color: #f0f9eb;
+      border: 1px solid #e1f3d8;
+      border-radius: 4px;
+      color: #67c23a;
+      font-weight: 500;
+      i {
+        font-size: 18px;
+      }
+    }
+    .pdf-frame {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #e4e7ed;
+      border-radius: 4px;
     }
     .tc-btn-delete {
       background-color: #fef0f0;

@@ -3,28 +3,30 @@
     <div id="problem-main">
       <!--problem main-->
       <Panel :padding="40" shadow>
-        <div slot="title">{{problem.title}}</div>
+        <div slot="title" style="text-align: center; font-size: 24px;">{{problem.title}}</div>
         <div id="problem-content" class="markdown-body" v-katex>
-          <p class="title">{{$t('m.Description')}}</p>
-          <p class="content" v-html=problem.description></p>
-          <!-- {{$t('m.music')}} -->
-          <p class="title">{{$t('m.Input')}} <span v-if="problem.io_mode.io_mode=='File IO'">({{$t('m.FromFile')}}: {{ problem.io_mode.input }})</span></p>
-          <p class="content" v-html=problem.input_description></p>
+          <div v-if="problem.description_pdf">
+            <iframe :src="problem.description_pdf" class="problem-pdf-viewer"></iframe>
+          </div>
+          <div v-else>
+            <p class="title">{{$t('m.Description')}}</p>
+            <p class="content" v-html=problem.description></p>
+            <!-- {{$t('m.music')}} -->
+            <p class="title">{{$t('m.Input')}} <span v-if="problem.io_mode.io_mode=='File IO'">({{$t('m.FromFile')}}: {{ problem.io_mode.input }})</span></p>
+            <p class="content" v-html=problem.input_description></p>
 
-          <p class="title">{{$t('m.Output')}} <span v-if="problem.io_mode.io_mode=='File IO'">({{$t('m.ToFile')}}: {{ problem.io_mode.output }})</span></p>
-          <p class="content" v-html=problem.output_description></p>
+            <p class="title">{{$t('m.Output')}} <span v-if="problem.io_mode.io_mode=='File IO'">({{$t('m.ToFile')}}: {{ problem.io_mode.output }})</span></p>
+            <p class="content" v-html=problem.output_description></p>
+          </div>
 
           <div v-for="(sample, index) of problem.samples" :key="index">
             <div class="flex-container sample">
-              <div class="sample-input">
-                <p class="title">{{$t('m.Sample_Input')}} {{index + 1}}
-                  <a class="copy"
-                     v-clipboard:copy="sample.input"
-                     v-clipboard:success="onCopy"
-                     v-clipboard:error="onCopyError">
-                    <Icon type="clipboard"></Icon>
-                  </a>
-                </p>
+              <div class="sample-input"
+                   v-clipboard:copy="sample.input"
+                   v-clipboard:success="onCopy"
+                   v-clipboard:error="onCopyError"
+                   style="cursor: pointer;">
+                <p class="title">{{$t('m.Sample_Input')}} {{index + 1}}</p>
                 <pre>{{sample.input}}</pre>
               </div>
               <div class="sample-output">
@@ -622,7 +624,7 @@
     margin-top: -50px;
     .title {
       font-size: 20px;
-      font-weight: 400;
+      font-weight: 700;
       margin: 25px 0 8px 0;
       color: #3091f2;
       .copy {
@@ -649,6 +651,12 @@
         border-style: solid;
         background: transparent;
       }
+    }
+    .problem-pdf-viewer {
+      width: 100%;
+      height: 600px;
+      border: 1px solid #e4e7ed;
+      border-radius: 4px;
     }
   }
 
