@@ -226,6 +226,25 @@ export default {
       data
     })
   },
+  uploadManualTestCaseFiles (formData) {
+    return new Promise((resolve, reject) => {
+      axios.post('admin/manual_test_case', formData, {
+        headers: {'Content-Type': 'multipart/form-data'}
+      }).then(res => {
+        if (res.data.error !== null) {
+          Vue.prototype.$error(res.data.data)
+          reject(res)
+        } else {
+          resolve(res)
+          Vue.prototype.$success('Succeeded')
+        }
+      }, err => {
+        reject(err)
+        let msg = (err.response && err.response.data && err.response.data.data) || 'Upload failed'
+        Vue.prototype.$error(msg)
+      })
+    })
+  },
   compileSPJ (data) {
     return ajax('admin/compile_spj', 'post', {
       data

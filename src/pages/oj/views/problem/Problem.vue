@@ -126,7 +126,7 @@
               <div class="comment-header">
                 <span class="comment-user">{{ comment.created_by }}</span>
                 <span class="comment-time">{{ comment.create_time | localtime }}</span>
-                <Button v-if="isSuperAdmin" type="text" size="small" class="comment-delete" @click="deleteComment(comment.id)">
+                <Button v-if="isSuperAdmin || comment.created_by === currentUsername" type="text" size="small" class="comment-delete" @click="deleteComment(comment.id)">
                   <Icon type="trash-a" color="#ff4949"></Icon>
                 </Button>
               </div>
@@ -563,6 +563,9 @@
       },
       isSuperAdmin () {
         return this.$store.getters.isSuperAdmin
+      },
+      currentUsername () {
+        return this.$store.getters.user.username || ''
       },
       contest () {
         return this.$store.state.contest.contest

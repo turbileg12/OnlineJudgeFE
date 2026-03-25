@@ -245,28 +245,59 @@
           </el-col>
 
           <el-col :span="24" style="margin-top: 10px;">
-            <el-form-item label="Manual Test Cases">
+            <el-form-item label="Test Cases">
+              <!-- File-based test cases -->
               <div v-for="(tc, index) in manualTestCases" :key="'tc'+index" style="margin-bottom: 15px; border: 1px solid #dcdfe6; padding: 15px; border-radius: 4px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                  <strong>Test Case {{ index + 1 }}</strong>
+                  <strong>Test Case File {{ index + 1 }}</strong>
                   <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeManualTestCase(index)">Delete</el-button>
                 </div>
                 <el-row :gutter="20">
                   <el-col :span="12">
+                    <el-form-item label="Input File">
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <el-button size="small" type="primary" icon="el-icon-upload2" @click="triggerFileInput('input', index)">Choose File</el-button>
+                        <span v-if="tc.inputFileName" style="color: #67c23a;">{{ tc.inputFileName }}</span>
+                        <span v-else style="color: #909399;">No file chosen</span>
+                      </div>
+                      <input type="file" :ref="'inputFile' + index" style="display: none;" @change="handleFileSelect('input', index, $event)">
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="Output File">
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <el-button size="small" type="primary" icon="el-icon-upload2" @click="triggerFileInput('output', index)">Choose File</el-button>
+                        <span v-if="tc.outputFileName" style="color: #67c23a;">{{ tc.outputFileName }}</span>
+                        <span v-else style="color: #909399;">No file chosen</span>
+                      </div>
+                      <input type="file" :ref="'outputFile' + index" style="display: none;" @change="handleFileSelect('output', index, $event)">
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </div>
+              <!-- Text-based test cases -->
+              <div v-for="(tc, index) in manualTextTestCases" :key="'ttc'+index" style="margin-bottom: 15px; border: 1px solid #dcdfe6; padding: 15px; border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <strong>Test Case Text {{ index + 1 }}</strong>
+                  <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeManualTextTestCase(index)">Delete</el-button>
+                </div>
+                <el-row :gutter="20">
+                  <el-col :span="12">
                     <el-form-item label="Input">
-                      <el-input type="textarea" :rows="4" placeholder="Input" v-model="tc.input"></el-input>
+                      <el-input type="textarea" v-model="tc.input" :rows="4" placeholder="Enter input data"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="12">
                     <el-form-item label="Output">
-                      <el-input type="textarea" :rows="4" placeholder="Output" v-model="tc.output"></el-input>
+                      <el-input type="textarea" v-model="tc.output" :rows="4" placeholder="Enter expected output"></el-input>
                     </el-form-item>
                   </el-col>
                 </el-row>
               </div>
               <div>
-                <el-button type="primary" size="small" icon="el-icon-plus" @click="addManualTestCase">Add Test Case</el-button>
-                <el-button type="success" size="small" icon="el-icon-upload2" @click="submitManualTestCases" :loading="uploadingManual" :disabled="manualTestCases.length === 0">Upload Test Cases</el-button>
+                <el-button type="primary" size="small" icon="el-icon-plus" @click="addManualTestCase">Add Test Case File</el-button>
+                <el-button type="primary" size="small" icon="el-icon-plus" @click="addManualTextTestCase">Add Test Case Text</el-button>
+                <el-button type="success" size="small" icon="el-icon-upload2" @click="submitManualTestCases" :loading="uploadingManual" :disabled="manualTestCases.length === 0 && manualTextTestCases.length === 0">Upload Test Cases</el-button>
               </div>
             </el-form-item>
           </el-col>
@@ -380,6 +411,7 @@
         descriptionMode: 'editor',
         testCaseUploaded: false,
         manualTestCases: [],
+        manualTextTestCases: [],
         uploadingManual: false,
         allLanguage: {},
         inputVisible: false,
@@ -596,27 +628,73 @@
         this.$error('Upload failed')
       },
       addManualTestCase () {
-        this.manualTestCases.push({input: '', output: ''})
+        this.manualTestCases.push({inputFile: null, outputFile: null, inputFileName: '', outputFileName: ''})
       },
       removeManualTestCase (index) {
         this.manualTestCases.splice(index, 1)
       },
+      addManualTextTestCase () {
+        this.manualTextTestCases.push({input: '', output: ''})
+      },
+      removeManualTextTestCase (index) {
+        this.manualTextTestCases.splice(index, 1)
+      },
+      triggerFileInput (type, index) {
+        let ref = type === 'input' ? 'inputFile' + index : 'outputFile' + index
+        let el = this.$refs[ref]
+        // Vue 2 wraps dynamic refs inside v-for as arrays
+        if (Array.isArray(el)) {
+          el = el[0]
+        }
+        if (el) {
+          el.click()
+        }
+      },
+      handleFileSelect (type, index, event) {
+        let file = event.target.files[0]
+        if (!file) return
+        if (type === 'input') {
+          this.manualTestCases[index].inputFile = file
+          this.manualTestCases[index].inputFileName = file.name
+        } else {
+          this.manualTestCases[index].outputFile = file
+          this.manualTestCases[index].outputFileName = file.name
+        }
+      },
       submitManualTestCases () {
         for (let tc of this.manualTestCases) {
+          if (!tc.inputFile || (!this.problem.spj && !tc.outputFile)) {
+            this.$error('Please select input and output files for all test cases')
+            return
+          }
+        }
+        for (let tc of this.manualTextTestCases) {
           if (!tc.input.trim() || (!this.problem.spj && !tc.output.trim())) {
-            this.$error('Test case input and output cannot be empty')
+            this.$error('Please fill in input and output for all text test cases')
             return
           }
         }
         this.uploadingManual = true
-        let payload = {
-          test_cases: this.manualTestCases,
-          spj: this.problem.spj
-        }
+        let formData = new FormData()
+        formData.append('spj', this.problem.spj)
         if (this.problem.test_case_id) {
-          payload.test_case_id = this.problem.test_case_id
+          formData.append('test_case_id', this.problem.test_case_id)
         }
-        api.uploadManualTestCase(payload).then(res => {
+        for (let i = 0; i < this.manualTestCases.length; i++) {
+          formData.append('input_files', this.manualTestCases[i].inputFile)
+          if (this.manualTestCases[i].outputFile) {
+            formData.append('output_files', this.manualTestCases[i].outputFile)
+          }
+        }
+        for (let i = 0; i < this.manualTextTestCases.length; i++) {
+          let inputBlob = new Blob([this.manualTextTestCases[i].input], {type: 'text/plain'})
+          let outputBlob = new Blob([this.manualTextTestCases[i].output], {type: 'text/plain'})
+          formData.append('input_files', inputBlob, (this.manualTestCases.length + i + 1) + '.in')
+          if (!this.problem.spj) {
+            formData.append('output_files', outputBlob, (this.manualTestCases.length + i + 1) + '.out')
+          }
+        }
+        api.uploadManualTestCaseFiles(formData).then(res => {
           this.uploadingManual = false
           let fileList = res.data.data.info
           for (let file of fileList) {
@@ -629,6 +707,7 @@
           this.testCaseUploaded = true
           this.problem.test_case_id = res.data.data.id
           this.manualTestCases = []
+          this.manualTextTestCases = []
         }, () => {
           this.uploadingManual = false
         })

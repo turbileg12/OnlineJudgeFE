@@ -136,11 +136,13 @@
         if (!this.init) {
           api.editSMTPConfig(this.smtp).then(() => {
             this.saved = true
+            this.$success('Saved successfully')
           }, () => {
           })
         } else {
           api.createSMTPConfig(this.smtp).then(() => {
             this.saved = true
+            this.$success('Saved successfully')
           }, () => {
           })
         }
@@ -160,8 +162,10 @@
         })
       },
       saveWebsiteConfig () {
-        api.editWebsiteConfig(this.websiteConfig).then(() => {
-        }).catch(() => {
+        api.editWebsiteConfig(this.websiteConfig).then(res => {
+          this.$success('Saved successfully')
+        }).catch(err => {
+          this.$error(err.data ? err.data.data : 'Save failed')
         })
       }
     }
