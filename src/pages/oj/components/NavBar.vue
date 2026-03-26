@@ -1,7 +1,13 @@
 <template>
   <div id="header">
     <Menu theme="light" mode="horizontal" @on-select="handleRoute" :active-name="activeMenu" class="oj-menu">
-      <div class="logo"><span>{{website.website_name}}</span></div>
+      <div class="logo" @click="$router.push('/')">
+        <svg class="logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="36" height="36" rx="8" fill="#1e88e5"/>
+          <text x="20" y="27" text-anchor="middle" font-size="20" font-weight="bold" fill="#fff" font-family="monospace">&lt;/&gt;</text>
+        </svg>
+        <span class="logo-text">Online<strong>Judge</strong></span>
+      </div>
       <Menu-item name="/">
         <Icon type="home"></Icon>
         {{$t('m.Home')}}
@@ -139,7 +145,8 @@
     background-color: #fff;
     box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
     .oj-menu {
-      background: #fdfdfd;
+      background: #fff;
+      border-bottom: 2px solid #1e88e5;
     }
 
     .logo {
@@ -148,6 +155,28 @@
       font-size: 20px;
       float: left;
       line-height: 60px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      &:hover {
+        opacity: 0.8;
+      }
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        margin-right: 10px;
+      }
+      .logo-text {
+        font-size: 22px;
+        color: #1e88e5;
+        letter-spacing: -0.5px;
+        font-weight: 400;
+        strong {
+          font-weight: 700;
+          color: #0d47a1;
+        }
+      }
     }
 
     .drop-menu {

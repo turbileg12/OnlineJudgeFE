@@ -6,10 +6,14 @@
         <router-view></router-view>
       </transition>
       <div class="footer">
+        <div class="footer-brand">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;">
+            <rect x="2" y="2" width="36" height="36" rx="8" fill="#1e88e5"/>
+            <text x="20" y="27" text-anchor="middle" font-size="20" font-weight="bold" fill="#fff" font-family="monospace">&lt;/&gt;</text>
+          </svg>
+          <span style="color:#1e88e5;font-weight:600;">Online</span><span style="color:#0d47a1;font-weight:700;">Judge</span>
+        </div>
         <p v-html="website.website_footer"></p>
-        <p>Powered by <a href="https://github.com/QingdaoU/OnlineJudge">OnlineJudge</a>
-          <span v-if="version">&nbsp; Version: {{ version }}</span>
-        </p>
       </div>
     </div>
     <BackTop></BackTop>
@@ -88,10 +92,15 @@
 }
 
   .footer {
-    margin-top: 20px;
+    margin-top: 40px;
     margin-bottom: 10px;
     text-align: center;
     font-size: small;
+    padding: 20px 0;
+    border-top: 1px solid #e8e8e8;
+    .footer-brand {
+      margin-bottom: 8px;
+    }
   }
 
   .fadeInUp-enter-active {
