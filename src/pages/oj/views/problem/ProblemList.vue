@@ -96,27 +96,6 @@
         tagList: [],
         problemTableColumns: [
           {
-            title: '#',
-            key: '_id',
-            width: 80,
-            render: (h, params) => {
-              return h('Button', {
-                props: {
-                  type: 'text',
-                  size: 'large'
-                },
-                on: {
-                  click: () => {
-                    this.$router.push({name: 'problem-details', params: {problemID: params.row._id}})
-                  }
-                },
-                style: {
-                  padding: '2px 0'
-                }
-              }, params.row._id)
-            }
-          },
-          {
             title: this.$i18n.t('m.Title'),
             width: 400,
             render: (h, params) => {
@@ -302,6 +281,15 @@
     }
   }
 </script>
+
+<style lang="less">
+  .status-column .ivu-table-cell {
+    font-size: 0;
+  }
+  .status-column .ivu-table-cell div {
+    font-size: 16px;
+  }
+</style>
 
 <style scoped lang="less">
   .taglist-title {

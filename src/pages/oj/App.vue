@@ -13,7 +13,7 @@
           </svg>
           <span style="color:#1e88e5;font-weight:600;">Online</span><span style="color:#0d47a1;font-weight:700;">Judge</span>
         </div>
-        <p v-html="website.website_footer"></p>
+        <p style="margin-top: 8px; color: #999; font-size: 12px;">Developed by Turbileg</p>
       </div>
     </div>
     <BackTop></BackTop>
