@@ -53,6 +53,12 @@
     <Col :span="5">
     <Panel :padding="10">
       <div slot="title" class="taglist-title">{{$t('m.Tags')}}</div>
+      <Button @click="filterByTag('')"
+              type="ghost"
+              :disabled="query.tag === ''"
+              shape="circle"
+              class="tag-btn">{{$t('m.All')}}
+      </Button>
       <Button v-for="tag in tagList"
               :key="tag.name"
               @click="filterByTag(tag.name)"

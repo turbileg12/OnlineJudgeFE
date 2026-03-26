@@ -11,34 +11,20 @@ export default {
       return utils.getACRate(ACCount, TotalCount)
     },
     addStatusColumn (tableColumns, dataProblems) {
-      // 已添加过直接返回
       if (this.statusColumn) return
-      // 只在有做题记录时才添加column
-      let needAdd = dataProblems.some((item, index) => {
-        if (item.my_status !== null && item.my_status !== undefined) {
-          return true
-        }
-      })
-      if (!needAdd) {
-        return
-      }
       tableColumns.splice(0, 0, {
-        width: 60,
+        width: 50,
         title: ' ',
+        align: 'center',
         render: (h, params) => {
           let status = params.row.my_status
           if (status === null || status === undefined) {
-            return undefined
+            return h('div', { style: { color: '#c0c0c0' } }, '—')
           }
-          return h('Icon', {
-            props: {
-              type: status === 0 ? 'checkmark-round' : 'minus-round',
-              size: '16'
-            },
-            style: {
-              color: status === 0 ? '#19be6b' : '#ed3f14'
-            }
-          })
+          let icon = status === 0
+            ? h('Icon', { props: { type: 'checkmark-round', size: '18' }, style: { color: '#19be6b' } })
+            : h('Icon', { props: { type: 'close-round', size: '18' }, style: { color: '#ed3f14' } })
+          return h('div', { style: { overflow: 'hidden', textOverflow: 'clip', lineHeight: '1' } }, [icon])
         }
       })
       this.statusColumn = true

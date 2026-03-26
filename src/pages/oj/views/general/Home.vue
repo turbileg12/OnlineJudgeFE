@@ -143,6 +143,7 @@
     opacity: 0.9;
     margin-bottom: 30px;
   }
+
   .hero-stats {
     display: flex;
     justify-content: center;
