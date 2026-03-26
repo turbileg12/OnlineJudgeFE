@@ -1,5 +1,10 @@
 html {
   background-color: #eee;
+  transition: background-color 0.3s;
+}
+
+html.dark-mode {
+  background-color: #1a1a2e;
 }
 
 body {
@@ -9,6 +14,207 @@ body {
   -webkit-font-smoothing: antialiased;
   background-color: #eee;
   min-width: 900px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+// Dark Mode
+body.dark-mode {
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+
+  html& {
+    background-color: #1a1a2e;
+  }
+
+  // Header & NavBar
+  #header {
+    background-color: #16213e !important;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.3);
+    .oj-menu {
+      background: #16213e !important;
+      border-bottom-color: #0f3460;
+    }
+    .ivu-menu-light {
+      background: #16213e !important;
+    }
+    .ivu-menu-item, .ivu-menu-submenu-title {
+      color: #ccc !important;
+      &:hover {
+        color: #64b5f6 !important;
+      }
+    }
+    .ivu-menu-item-active {
+      color: #64b5f6 !important;
+      border-bottom-color: #64b5f6 !important;
+    }
+    .logo-text {
+      color: #64b5f6 !important;
+      strong {
+        color: #90caf9 !important;
+      }
+    }
+    .dark-toggle {
+      color: #fdd835 !important;
+    }
+    .btn-menu .ivu-btn-ghost {
+      color: #ccc !important;
+      border-color: #555 !important;
+      &:hover {
+        color: #64b5f6 !important;
+        border-color: #64b5f6 !important;
+      }
+    }
+    .drop-menu-title {
+      color: #ccc !important;
+    }
+  }
+
+  // Cards & Panels
+  .ivu-card {
+    background-color: #16213e !important;
+    border-color: #2a2a4a !important;
+    color: #e0e0e0 !important;
+  }
+  .ivu-card-head {
+    border-bottom-color: #2a2a4a !important;
+    color: #e0e0e0 !important;
+    p, div, span {
+      color: #e0e0e0 !important;
+    }
+  }
+
+  // Tables
+  .ivu-table {
+    background-color: #16213e !important;
+    color: #e0e0e0 !important;
+    &::before, &::after {
+      background-color: #2a2a4a !important;
+    }
+  }
+  .ivu-table-header {
+    background-color: #1a1a3e !important;
+  }
+  .ivu-table th {
+    background-color: #1a1a3e !important;
+    border-bottom-color: #2a2a4a !important;
+    color: #aaa !important;
+  }
+  .ivu-table td {
+    background-color: #16213e !important;
+    border-bottom-color: #2a2a4a !important;
+    color: #e0e0e0 !important;
+  }
+  .ivu-table-row:hover td {
+    background-color: #1e2a4a !important;
+  }
+
+  // Buttons
+  .ivu-btn-text {
+    color: #64b5f6 !important;
+  }
+  .ivu-btn-ghost {
+    color: #ccc !important;
+    border-color: #555 !important;
+  }
+
+  // Tags
+  .ivu-tag {
+    border-color: #444 !important;
+  }
+
+  // Input
+  .ivu-input {
+    background-color: #1e2a4a !important;
+    border-color: #2a2a4a !important;
+    color: #e0e0e0 !important;
+    &::placeholder {
+      color: #666 !important;
+    }
+  }
+
+  // Pagination
+  .ivu-page-item {
+    background-color: #16213e !important;
+    border-color: #2a2a4a !important;
+    a {
+      color: #ccc !important;
+    }
+    &.ivu-page-item-active {
+      background-color: #0f3460 !important;
+      border-color: #1e88e5 !important;
+      a {
+        color: #64b5f6 !important;
+      }
+    }
+  }
+  .ivu-page-prev, .ivu-page-next {
+    background-color: #16213e !important;
+    border-color: #2a2a4a !important;
+    a {
+      color: #ccc !important;
+    }
+  }
+  .ivu-page-options .ivu-select-selection {
+    background-color: #16213e !important;
+    border-color: #2a2a4a !important;
+    color: #ccc !important;
+  }
+
+  // Dropdown
+  .ivu-dropdown-menu {
+    background-color: #16213e !important;
+  }
+  .ivu-dropdown-item {
+    color: #ccc !important;
+    &:hover {
+      background-color: #1e2a4a !important;
+    }
+  }
+
+  // Modal
+  .ivu-modal-content {
+    background-color: #16213e !important;
+    color: #e0e0e0 !important;
+  }
+  .ivu-modal-header {
+    border-bottom-color: #2a2a4a !important;
+    color: #e0e0e0 !important;
+  }
+
+  // Footer
+  .footer {
+    border-top-color: #2a2a4a !important;
+    color: #888 !important;
+  }
+
+  // Select
+  .ivu-select-dropdown {
+    background-color: #16213e !important;
+  }
+  .ivu-select-item {
+    color: #ccc !important;
+    &:hover {
+      background-color: #1e2a4a !important;
+    }
+  }
+
+  // Switch
+  .ivu-switch {
+    background-color: #444 !important;
+  }
+
+  // Loading spinner
+  .ivu-spin-fix {
+    background-color: rgba(22, 33, 62, 0.8) !important;
+  }
+
+  // Emphasis links
+  a.emphasis {
+    color: #aaa;
+    &:hover {
+      color: #64b5f6;
+    }
+  }
 }
 
 .flex-container {

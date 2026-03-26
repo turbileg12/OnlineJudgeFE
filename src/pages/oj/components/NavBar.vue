@@ -48,6 +48,9 @@
           {{$t('m.FAQ')}}
         </Menu-item>
       </Submenu>
+      <div class="dark-toggle" @click="toggleDarkMode">
+        <Icon :type="isDark ? 'ios-sunny' : 'ios-moon'" size="20"></Icon>
+      </div>
       <template v-if="!isAuthenticated">
         <div class="btn-menu">
           <Button type="ghost"
@@ -96,11 +99,26 @@
       login,
       register
     },
+    data () {
+      return {
+        isDark: localStorage.getItem('darkMode') === 'true'
+      }
+    },
     mounted () {
       this.getProfile()
+      if (this.isDark) {
+        document.body.classList.add('dark-mode')
+        document.documentElement.classList.add('dark-mode')
+      }
     },
     methods: {
       ...mapActions(['getProfile', 'changeModalStatus']),
+      toggleDarkMode () {
+        this.isDark = !this.isDark
+        document.body.classList.toggle('dark-mode', this.isDark)
+        document.documentElement.classList.toggle('dark-mode', this.isDark)
+        localStorage.setItem('darkMode', this.isDark)
+      },
       handleRoute (route) {
         if (route && route.indexOf('admin') < 0) {
           this.$router.push(route)
@@ -192,6 +210,17 @@
       font-size: 16px;
       float: right;
       margin-right: 10px;
+    }
+    .dark-toggle {
+      float: right;
+      margin-right: 15px;
+      line-height: 60px;
+      cursor: pointer;
+      color: #666;
+      transition: color 0.3s;
+      &:hover {
+        color: #1e88e5;
+      }
     }
   }
 
