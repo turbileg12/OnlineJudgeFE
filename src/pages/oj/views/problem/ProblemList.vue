@@ -39,11 +39,12 @@
           </li>
         </ul>
       </div>
-      <Table style="width: 100%; font-size: 16px;"
+      <Table style="width: 100%; font-size: 16px; cursor: pointer;"
              :columns="problemTableColumns"
              :data="problemList"
              :loading="loadings.table"
-             disabled-hover></Table>
+             class="problem-table"
+             @on-row-click="goToProblem"></Table>
     </Panel>
     <Pagination
       :total="total" :page-size.sync="query.limit" @on-change="pushRouter" @on-page-size-change="pushRouter" :current.sync="query.page" :show-sizer="true"></Pagination>
@@ -120,14 +121,29 @@
           },
           {
             title: this.$i18n.t('m.Level'),
+            align: 'center',
             render: (h, params) => {
               let t = params.row.difficulty
-              let color = 'blue'
-              if (t === 'Low') color = 'green'
-              else if (t === 'High') color = 'yellow'
-              return h('Tag', {
-                props: {
-                  color: color
+              let bgColor, textColor
+              if (t === 'Low') {
+                bgColor = '#e8f5e9'
+                textColor = '#2e7d32'
+              } else if (t === 'High') {
+                bgColor = '#fbe9e7'
+                textColor = '#c62828'
+              } else {
+                bgColor = '#e3f2fd'
+                textColor = '#1565c0'
+              }
+              return h('span', {
+                style: {
+                  backgroundColor: bgColor,
+                  color: textColor,
+                  padding: '4px 14px',
+                  borderRadius: '20px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  display: 'inline-block'
                 }
               }, this.$i18n.t('m.' + params.row.difficulty))
             }
@@ -138,8 +154,37 @@
           },
           {
             title: this.$i18n.t('m.AC_Rate'),
+            width: 180,
             render: (h, params) => {
-              return h('span', this.getACRate(params.row.accepted_number, params.row.submission_number))
+              let rate = this.getACRate(params.row.accepted_number, params.row.submission_number)
+              let percent = parseFloat(rate) || 0
+              let barColor = percent >= 60 ? '#43a047' : percent >= 30 ? '#fb8c00' : '#e53935'
+              return h('div', {
+                style: { display: 'flex', alignItems: 'center', gap: '8px' }
+              }, [
+                h('div', {
+                  style: {
+                    flex: '1',
+                    height: '8px',
+                    backgroundColor: '#f0f0f0',
+                    borderRadius: '4px',
+                    overflow: 'hidden'
+                  }
+                }, [
+                  h('div', {
+                    style: {
+                      width: percent + '%',
+                      height: '100%',
+                      backgroundColor: barColor,
+                      borderRadius: '4px',
+                      transition: 'width 0.6s ease'
+                    }
+                  })
+                ]),
+                h('span', {
+                  style: { fontSize: '13px', color: '#666', minWidth: '42px', textAlign: 'right' }
+                }, rate)
+              ])
             }
           }
         ],
@@ -257,6 +302,9 @@
       onReset () {
         this.$router.push({name: 'problem-list'})
       },
+      goToProblem (row) {
+        this.$router.push({name: 'problem-details', params: {problemID: row._id}})
+      },
       pickone () {
         api.pickone().then(res => {
           this.$success('Good Luck')
@@ -288,6 +336,13 @@
   }
   .status-column .ivu-table-cell div {
     font-size: 16px;
+  }
+  .problem-table .ivu-table-row {
+    transition: all 0.25s ease;
+    &:hover td {
+      background-color: #f0f7ff !important;
+      box-shadow: 0 2px 8px rgba(30, 136, 229, 0.08);
+    }
   }
 </style>
 
