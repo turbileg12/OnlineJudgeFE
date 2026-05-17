@@ -26,7 +26,7 @@
                 </el-radio-group>
                 <el-upload
                   v-if="descriptionMode === 'pdf'"
-                  action="/api/admin/upload_file"
+                  action="/onlinejudge/api/admin/upload_file"
                   name="file"
                   accept=".pdf"
                   :show-file-list="false"
@@ -233,7 +233,7 @@
           <el-col :span="6">
             <el-form-item :label="$t('m.TestCase')" :error="error.testcase">
               <el-upload
-                action="/api/admin/test_case"
+                action="/onlinejudge/api/admin/test_case"
                 name="file"
                 :data="{spj: problem.spj}"
                 :show-file-list="true"

@@ -4,7 +4,7 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 Vue.prototype.$http = axios
-axios.defaults.baseURL = '/api'
+axios.defaults.baseURL = '/onlinejudge/api'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 axios.defaults.xsrfCookieName = 'csrftoken'
 

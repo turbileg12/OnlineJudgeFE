@@ -59,7 +59,7 @@
     <panel title="Import QDUOJ Problems (beta)">
       <el-upload
         ref="QDU"
-        action="/api/admin/import_problem"
+        action="/onlinejudge/api/admin/import_problem"
         name="file"
         :file-list="fileList1"
         :show-file-list="true"
@@ -77,7 +77,7 @@
     <panel title="Import FPS Problems (beta)">
       <el-upload
         ref="FPS"
-        action="/api/admin/import_fps"
+        action="/onlinejudge/api/admin/import_fps"
         name="file"
         :file-list="fileList2"
         :show-file-list="true"
@@ -138,7 +138,7 @@
         for (let p of this.selected_problems) {
           params.push('problem_id=' + p.id)
         }
-        let url = '/admin/export_problem?' + params.join('&')
+        let url = '/onlinejudge/admin/export_problem?' + params.join('&')
         utils.downloadFile(url)
       },
       submitUpload (ref) {
