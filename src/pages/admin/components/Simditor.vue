@@ -28,8 +28,12 @@
       }
     },
     mounted () {
+      // Simditor's default locale (via simple-module) is 'zh-CN', which makes
+      // the whole editor toolbar render in Chinese. Force English.
+      Simditor.locale = 'en-US'
       this.editor = new Simditor({
         textarea: this.$refs.editor,
+        locale: 'en-US',
         toolbar: this.toolbar,
         pasteImage: true,
         markdown: false,
