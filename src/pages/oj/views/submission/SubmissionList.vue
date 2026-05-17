@@ -35,7 +35,7 @@
             </li>
           </ul>
         </div>
-        <Table stripe :disabled-hover="true" :columns="columns" :data="submissions" :loading="loadingTable"></Table>
+        <Table stripe :columns="columns" :data="submissions" :loading="loadingTable" class="status-table"></Table>
         <Pagination :total="total" :page-size="limit" @on-change="changeRoute" :current.sync="page"></Pagination>
       </Panel>
     </div>
@@ -133,14 +133,24 @@
             title: this.$i18n.t('m.Time'),
             align: 'center',
             render: (h, params) => {
-              return h('span', utils.submissionTimeFormat(params.row.statistic_info.time_cost))
+              return h('span', {
+                style: { display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#666' }
+              }, [
+                h('Icon', { props: { type: 'ios-clock-outline', size: '14' }, style: { color: '#999' } }),
+                utils.submissionTimeFormat(params.row.statistic_info.time_cost)
+              ])
             }
           },
           {
             title: this.$i18n.t('m.Memory'),
             align: 'center',
             render: (h, params) => {
-              return h('span', utils.submissionMemoryFormat(params.row.statistic_info.memory_cost))
+              return h('span', {
+                style: { display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#666' }
+              }, [
+                h('Icon', { props: { type: 'ios-speedometer-outline', size: '14' }, style: { color: '#999' } }),
+                utils.submissionMemoryFormat(params.row.statistic_info.memory_cost)
+              ])
             }
           },
           {
@@ -155,7 +165,10 @@
               return h('a', {
                 style: {
                   'display': 'inline-block',
-                  'max-width': '150px'
+                  'max-width': '150px',
+                  'color': '#57a3f3',
+                  'cursor': 'pointer',
+                  'fontWeight': '500'
                 },
                 on: {
                   click: () => {
@@ -326,6 +339,15 @@
     }
   }
 </script>
+
+<style lang="less">
+  .status-table .ivu-table-row {
+    transition: background-color 0.2s ease;
+    &:hover td {
+      background-color: #f0f7ff !important;
+    }
+  }
+</style>
 
 <style scoped lang="less">
   .ivu-btn-text {
