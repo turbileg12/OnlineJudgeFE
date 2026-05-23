@@ -109,6 +109,7 @@ export const m = {
   Contest_Status: 'Status',
   Allowed_IP_Ranges: 'Allowed IP Ranges',
   CIDR_Network: 'CIDR Network',
+  Only_One_IP: 'Only One IP Address',
   // Dashboard.vue
   Last_Login: 'Last Login',
   System_Overview: 'System Overview',

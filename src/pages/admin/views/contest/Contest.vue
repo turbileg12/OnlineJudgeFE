@@ -75,6 +75,15 @@
               </div>
             </el-form-item>
           </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('m.Only_One_IP')">
+              <el-switch
+                v-model="contest.only_one_ip"
+                active-color="#13ce66"
+                inactive-color="#ff4949">
+              </el-switch>
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
       <save @click.native="saveContest"></save>
@@ -106,7 +115,8 @@
           visible: true,
           allowed_ip_ranges: [{
             value: ''
-          }]
+          }],
+          only_one_ip: false
         }
       }
     },

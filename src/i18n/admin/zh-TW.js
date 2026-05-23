@@ -100,6 +100,7 @@ export const m = {
   Contest_Status: '狀態',
   Allowed_IP_Ranges: '允許的 IP 範圍',
   CIDR_Network: 'CIDR Network',
+  Only_One_IP: '僅限一個 IP 位址',
   // Dashboard.vue
   Last_Login: '最後登入狀態',
   System_Overview: '系統狀況',

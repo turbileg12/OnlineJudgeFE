@@ -109,6 +109,7 @@ export const m = {
   Contest_Status: '状态',
   Allowed_IP_Ranges: '允许的 IP 范围',
   CIDR_Network: 'CIDR 网络',
+  Only_One_IP: '仅限一个 IP 地址',
   // Dashboard.vue
   Last_Login: '最后登录状态',
   System_Overview: '系统状况',
